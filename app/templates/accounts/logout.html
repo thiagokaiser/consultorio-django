@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+
+        <!-- Tell the browser to be responsive to screen width -->
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+        {% block title %}
+            <title>Logout</title>
+        {% endblock title %}
+
+        {% load static %}
+        <!-- Bootstrap 3.3.4 -->
+        <link rel="stylesheet" type="text/css" href="{% static 'app/bootstrap/css/bootstrap.css' %}" />
+        <!-- Theme style -->
+        <link rel="stylesheet" type="text/css" href="{% static 'app/dist/css/AdminLTE.css' %}" />
+        <!-- CSS TEMPLATE -->
+        <link rel="stylesheet" type="text/css" href="{% static 'app/style.css' %}" />
+        <!-- CSS Tema azul -->
+        <link rel="stylesheet" type="text/css" href="{% static 'app/dist/css/skins/skin-black-light.css' %}" />        
+        <!-- Font Awesome Icons -->
+        <link rel="stylesheet" type="text/css" href="{% static 'app/font-awesome/css/font-awesome.min.css' %}" />        
+        
+
+
+    </head>
+
+
+    <body class="login-page">
+		<div class="login-box">
+		    <div class="login-box-body">
+		        <h1 class="text-center">Você foi desconectado</h1>                
+		        <div class="modal-body">		            
+		            <ul class="">
+			            <li><a href="{% url 'app:login' %}">Logar novamente</a></li>   
+			            <li><a href="{% url 'app:register' %}">Registrar</a></li>   
+			            <li><a href="{% url 'app:reset_password' %}">Esqueceu a senha?</a></li>   
+			        </ul>
+		        </div>
+		    </div>
+		</div>
+	</body>
+</html>		  

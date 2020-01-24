@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+
+        <!-- Tell the browser to be responsive to screen width -->
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+        {% block title %}
+            <title>Kaiserz</title>
+        {% endblock title %}
+
+        {% load static %}
+        <!-- Bootstrap 3.3.4 -->
+        <link rel="stylesheet" type="text/css" href="{% static 'app/bootstrap/css/bootstrap.css' %}" />
+        <!-- Theme style -->
+        <link rel="stylesheet" type="text/css" href="{% static 'app/dist/css/AdminLTE.css' %}" />
+        <!-- CSS TEMPLATE -->
+        <link rel="stylesheet" type="text/css" href="{% static 'app/style.css' %}" />
+        <!-- CSS Tema azul -->
+        <link rel="stylesheet" type="text/css" href="{% static 'app/dist/css/skins/' %}{{ user.profile.layoutskin.nome_css }}.css "/>        
+        <!-- Font Awesome Icons -->
+        <link rel="stylesheet" type="text/css" href="{% static 'app/font-awesome/css/font-awesome.min.css' %}" />     
+        <!-- Multiselect personalizado -->
+        <link rel="stylesheet" type="text/css" href="{% static 'app/plugins/bootstrap-select/dist/css/bootstrap-select.css' %}" /> 
+
+        <link rel="stylesheet" type="text/css" href="{% static 'app/plugins/datatables/dataTables.bootstrap.css' %}" />                 
+
+    </head>
+
+
+    <body class="{{ user.profile.layoutskin.nome_css }} sidebar-mini {% if request.session.menu_aberto %} sidebar-collapse {% endif %}">
+
+        <div class="wrapper">
+            <!-- Main Header -->
+            <header class="main-header">
+
+                <!-- Logo -->
+                <a href="{% url 'consultorio:listPaciente' %}" class="logo">
+                    <!-- mini logo for sidebar mini 50x50 pixels -->
+                    <span class="logo-mini"><b>Kz</b></span>
+                    <!-- logo for regular state and mobile devices -->
+                    <span class="logo-lg">Kaiserz</span>
+                </a>
+
+                <!-- Header Navbar -->
+                <nav class="navbar navbar-static-top" role="navigation">
+                    <!-- Sidebar toggle button-->
+                    <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+                        <span class="sr-only">Toggle navigation</span>
+                    </a>
+                    <!-- Navbar Right Menu -->
+                    <div class="navbar-custom-menu">
+                        <ul class="nav navbar-nav">
+                            <!-- Messages: style can be found in dropdown.less-->
+                            <li class="dropdown messages-menu">
+                                <!-- Menu toggle button -->
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    <i class="fa fa-envelope-o"></i>
+                                    <span class="label label-success">{{ num_msgs }}</span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li class="header">Voce tem {{ num_msgs }} novas mensagens</li>
+                                    <li>
+                                        {% for msg in msgs %}
+                                        <!-- inner menu: contains the messages -->
+                                        <ul class="menu">
+                                            <li><!-- start message -->
+                                                <a href="{% url 'app:msg' pk=msg.pk %}">
+                                                    <div class="pull-left">
+                                                        <!-- User Image -->
+                                                        {% if msg.foto %}
+                                                            <img src="{{ msg.foto }}" class="img-circle" alt="User Image" />
+                                                        {% else %}
+                                                            <img src="{% static 'img/img-user.jpg' %}" class="img-circle" alt="User Image" />
+                                                        {% endif %}
+                                                    </div>
+                                                    <!-- Message title and timestamp -->                                                    
+                                                    <h4>
+                                                        {% if msg.lida == False %}
+                                                        <span style="font-weight: bold;">
+                                                        {% endif %}
+                                                        {{ msg.assunto | slice:":7"  }}
+                                                        {% if msg.lida == False %}
+                                                        </span>
+                                                        {% endif %}
+                                                        <small><i class="fa fa-clock-o"></i> {{ msg.dt_mensagem }}</small>
+                                                    </h4>
+                                                    <!-- The message -->                                                    
+                                                    <p>
+                                                        {% if msg.lida == False %}
+                                                        <span style="font-weight: bold;">
+                                                        {% endif %}
+                                                        {{ msg.mensagem | slice:":20" }}
+                                                        {% if msg.lida == False %}
+                                                        </span>
+                                                        {% endif %}
+                                                    </p>                                                    
+                                                </a>
+                                            </li><!-- end message -->
+                                        </ul><!-- /.menu -->                                        
+                                        {% endfor %}
+                                    </li>
+                                    <li class="footer"><a href="{% url 'app:inbox' %}">Ver todas mensagens</a></li>
+                                </ul>
+                            </li><!-- /.messages-menu -->
+
+                            <!-- User Account Menu -->
+                            <li class="dropdown user user-menu">
+                                <!-- Menu Toggle Button -->
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    <!-- The user image in the navbar-->
+                                    {% if user.profile.foto_perfil %}
+                                        <img src="{{ user.profile.foto_perfil.url }}" class="user-image" alt="User Image" />
+                                    {% else %}
+                                        <img src="{% static 'img/img-user.jpg' %}" class="user-image" alt="User Image" />
+                                    {% endif %}
+                                    <!-- hidden-xs hides the username on small devices so only the image appears. -->
+                                    <span class="hidden-xs">{{ user.first_name }}</span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <!-- The user image in the menu -->
+                                    <li class="user-header">
+                                        {% if user.profile.foto_perfil %}
+                                            <img src="{{ user.profile.foto_perfil.url }}" class="img-circle" alt="User Image" />
+                                        {% else %}
+                                            <img src="{% static 'img/img-user.jpg' %}" class="img-circle" alt="User Image" />
+                                        {% endif %}
+                                        <p>
+                                            {{ user.first_name }} {{ user.last_name }}
+                                            <small>Membro desde {{ user.date_joined }}</small>
+                                        </p>
+                                    </li>                                                                        
+                                    <!-- Menu Footer-->
+                                    <li class="user-footer">
+                                        <div class="pull-left">
+                                            <a href="{% url 'app:profile' %}" class="btn btn-default btn-flat">Perfil</a>
+                                        </div>
+                                        <div class="pull-right">
+                                            <a href="{% url 'app:logout' %}" class="btn btn-default btn-flat">Logout</a>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>              
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+
+            <!-- Left side column. contains the logo and sidebar -->
+            <aside class="main-sidebar">
+
+                <!-- sidebar: style can be found in sidebar.less -->
+                <section class="sidebar">
+
+                    <!-- Sidebar Menu -->
+                    <ul class="sidebar-menu">
+                        <li class="header">Menu</li>
+                        <!-- Optionally, you can add icons to the links 
+                        <li><a href="{% url 'app:home' %}"><i class="fa fa-home"></i> <span>Home</span></a></li>                        -->
+                        <li><a href="{% url 'consultorio:listPaciente' %}"><i class="fa fa-home"></i> <span>Consultorio</span></a></li>                                                
+                        <hr style="margin:1px" />                                                                        
+                        <!--
+                        <li class="treeview">
+                            <a href="#"><i class="fa fa-dollar"></i> <span>Consultas</span> <i class="fa fa-angle-left pull-right"></i></a>
+                            <ul class="treeview-menu">
+                                <li><a href="#"><i class="fa fa-circle-o"></i>Cadastro</a></li>
+                                <li><a href="#"><i class="fa fa-circle-o"></i>Consulta</a></li>
+                            </ul>
+                        </li>                                                
+                        <li class="treeview">
+                            <a href="#"><i class="fa fa-bar-chart"></i> <span>Relatórios</span> <i class="fa fa-angle-left pull-right"></i></a>
+                            <ul class="treeview-menu">
+                                <li><a href="#"><i class="fa fa-circle-o"></i>Planilhas</a></li>
+                                <li><a href="#"><i class="fa fa-circle-o"></i>Graficos</a></li>
+                            </ul>
+                        </li>                   
+                        <li class="treeview">
+                            <a href="#"><i class="fa fa-paperclip"></i> <span>Anexos</span> <i class="fa fa-angle-left pull-right"></i></a>
+                            <ul class="treeview-menu">
+                                <li><a href="#"><i class="fa fa-circle-o"></i>Cadastro</a></li>
+                                <li><a href="#"><i class="fa fa-circle-o"></i>Consulta</a></li>
+                            </ul>
+                        </li>                                                                             
+                        -->
+                    </ul><!-- /.sidebar-menu -->
+                </section>
+                <!-- /.sidebar -->
+            </aside>
+                
+            <!-- Content Wrapper. Contains page content -->            
+            <div class="content-wrapper">
+
+                {% if messages %}                
+                {% for message in messages %}
+                <div class="mensagem {{ message.tags }}" style="padding: 10px 20px; background: rgb(243, 156, 18); z-index: 999999; font-size: 16px; font-weight: 600;">
+                    <a class="pull-right fecha-msg" href="" data-toggle="tooltip" data-placement="left" title="" style="color: rgb(255, 255, 255); font-size: 16px;" data-original-title="Fechar!">&times;</a>                    
+                    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                    <i class="icon fa fa-ban"></i>
+                    {% endif %}
+                    {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+                    <i class="icon fa fa-check"></i> 
+                    {% endif %}
+                    
+                    {{ message }}                    
+                    
+                </div>
+                {% endfor %}
+                {% endif %}                
+
+                <div class="modal fade loading-modal" tabindex="-1" role="dialog" id="loadingdiv" data-backdrop="false" data-keyboard="false" style="padding-top: 90px;">                    
+                    <div class="modal-dialog loading-modal" role="document">                        
+                        <div class="loading-modal" style="display:inline-block;">
+                            <div class="loader">
+                            </div>                                                                      
+                        </div>                                                
+                    </div>
+                </div>                    
+
+                {% block content %}
+                <!-- Content Header (Page header) -->
+                <section class="content-header">
+                    <h1>
+                        Home
+                        <small>ola mundo</small>
+                    </h1>                    
+                </section>
+                <!-- Main content -->
+                <section class="content">
+                    <!-- Your Page Content Here -->                    
+                    <div class="box">            
+                        <div class="box-body">                                                        
+
+                        </div>
+                    </div>                    
+                </section><!-- /.content -->
+                {% endblock content %}
+            </div><!-- /.content-wrapper -->
+
+            <!-- Main Footer -->
+            <footer class="main-footer">
+                <!-- To the right -->
+                <div class="pull-right hidden-xs">
+                    Anything you want
+                </div>
+                <!-- Default to the left -->
+                <strong>Copyright &copy; 2015 <a href="#">Kaiser</a>.</strong> All rights reserved.
+            </footer>
+
+        </div><!-- ./wrapper -->
+
+        <!-- REQUIRED JS SCRIPTS -->
+
+        <!-- jQuery 2.1.4 -->
+        <script type="text/javascript" src="{% static 'app/plugins/jQuery/jquery-3.3.1.min.js' %}" ></script>
+        <!-- Bootstrap 3.3.2 JS -->
+        <script type="text/javascript" src="{% static 'app/bootstrap/js/bootstrap.js' %}"></script>        
+        <!-- AdminLTE App -->
+        <script type="text/javascript" src="{% static 'app/dist/js/app.min.js' %}"></script>
+        <!-- Multiselect personalizado -->
+        <script type="text/javascript" src="{% static 'app/plugins/bootstrap-select/dist/js/bootstrap-select.js' %}" ></script>
+        
+        <script type="text/javascript" src="{% static 'app/bootstrap-confirmation/bootstrap-confirmation.js' %}" ></script>                
+        <!-- fileDownload -->
+        <script type="text/javascript" src="{% static 'app/plugins/filedownload/jquery.fileDownload.js' %}" ></script>                
+        
+        <script type="text/javascript">
+            $('#loadingdiv').modal();
+            $(window).on('load', function(){ 
+                $('#loadingdiv').modal("hide"); 
+            });                          
+
+            $(".fecha-msg").click(function(e){    
+                $(".mensagem").remove();
+            });
+
+            $('.sidebar-toggle').click(function(e){
+                $.ajax({
+                    url:"{% url 'app:side_menu' %}",
+                    type: "GET",            
+                    data: {},
+                    success:function(response){                    
+                    },
+                    complete:function(){},
+                    error:function (xhr, textStatus, thrownError){}
+                });                
+            });
+
+            $(document).on({
+                ajaxStart: function () {                                
+                    $('#loadingdiv').modal(); 
+                },
+                ajaxStop: function() {
+                  $('#loadingdiv').modal("hide"); 
+                }
+            });
+
+        </script>
+        {% block javascript %}
+
+        {% endblock javascript %}
+        
+    </body>
+</html>

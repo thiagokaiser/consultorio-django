@@ -1,0 +1,222 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <h1>
+        Pacientes
+        <small>Lista</small>
+    </h1>                    
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <!-- Your Page Content Here -->                        
+    <div class="box box-primary">        
+        <div class="box-header with-border">                
+            <h3 class="box-title" id="headerPacientes">Busca Pacientes</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" id="btHeader"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+            </div>
+        </div>
+    
+        <!-- /.box-header -->
+        <div class="box-body">            
+            <div class="form-group">
+                <form method="GET">                                                                
+                    
+                        <input class="input-sm" pattern="[a-zA-Z0-9]+" type="text" id="nome" name="nome" value='{{ filtro.filtro1 }}' placeholder="Buscar...">
+                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>                    
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <small>Registros por pag.</small>
+                        <select class=""  id="reg_pag" name="reg_pag">                
+                            <option value="5">5</option>                                    
+                            <option value="10">10</option>                                    
+                            <option value="20">20</option>                                    
+                            <option value="30">30</option>                
+                        </select>                                           
+                        
+                </form>
+            </div>
+            <a class="btn btn-default" href="{% url 'consultorio:newPaciente' %}">Novo Paciente</a>
+            <p></p>
+            <div class="table-responsive">
+                <div style="max-width:900px;">
+                    <table class="table table-bordered table-selectable" id="table_despesa">                    
+                        <thead>
+                            <th>Nome</th>
+                            <th>Dt Nasc</th>                            
+                            <th>Cidade</th>
+                            <th>Estado</th>                            
+                        </thead>
+                        <tbody>
+                            {% for paciente in pacientes %}                                        
+                            <tr id="{{ paciente.pk|stringformat:"0.f" }}" class="linhaPaciente">
+                                <td class="colunatable"> {{ paciente.nome }}</td>                                                                                        
+                                <td class="colunatable"> {{ paciente.idade }}</td>
+                                <td class="colunatable"> {{ paciente.cidade }}</td>
+                                <td class="colunatable"> {{ paciente.estado }}</td>                                
+                            </tr>                
+                            {% endfor %}                            
+
+                        </tbody>
+    
+                    </table>                            
+                </div>
+            </div>   
+            <ul class="pagination">
+                {% if pacientes.has_previous %}
+                    <li><a href="{{ filtro.url }}&page=1"><span class="fa fa-angle-double-left"></span></a></li>
+                    <li><a href="{{ filtro.url }}&page={{ pacientes.previous_page_number }}"><span class="fa fa-angle-left"></span></a></li>
+                {% else %}
+                    <li class="disabled"><span class="fa fa-angle-double-left"></span></li>
+                    <li class="disabled"><span class="fa fa-angle-left"></span></li>
+                {% endif %}
+                {% for page in pacientes.paginator.page_range %}
+                    {% if page >= pacientes.number|add:"-3" and page < pacientes.number %}
+                        <li><a href="{{ filtro.url }}&page={{ page }}">{{ page }}</a></li>
+                    {% endif %}
+                    {% ifequal pacientes.number page %}
+                        <li class="active"><span>{{ pacientes.number }}</span></li>
+                    {% endifequal %}                    
+                    {% if page <= pacientes.number|add:"3" and page > pacientes.number %}
+                        <li><a href="{{ filtro.url }}&page={{ page }}">{{ page }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if pacientes.has_next %}
+                    <li><a href="{{ filtro.url }}&page={{ pacientes.next_page_number }}"><span class="fa fa-angle-right"></span></a></li>
+                    <li><a href="{{ filtro.url }}&page={{ pacientes.paginator.num_pages }}"><span class="fa fa-angle-double-right"></span></a></li>
+                {% else %}
+                    <li class="disabled"><span class="fa fa-angle-right"></span></li>      
+                    <li class="disabled"><span class="fa fa-angle-double-right"></span></li>
+                {% endif %}                
+            </ul>            
+        </div>
+    </div>
+
+    <div class="box box-primary" id="divConsultas" style="display: none;">            
+        <div class="box-body">                           
+            <div class="form-group">                
+                <label for="nomePaciente" class="control-label">Paciente:</label>                            
+                <span class="spanPaciente" id="nomePaciente"></span>                
+
+                <label for="dtNasc" class="control-label">Dt Nasc:</label>                        
+                <span class="spanPaciente" id="dtNasc"></span>
+
+                <p></p>
+
+                <label for="cidade" class="control-label">Cidade:</label>                                        
+                <span class="spanPaciente" id="cidade"></span>                                           
+
+                <label for="estado" class="control-label">Estado:</label>                                        
+                <span class="spanPaciente" id="estado"></span>      
+                <a class="btn btn-default" id="bt_editPaciente" href=""><i class="fa fa-edit"></i></a>                                      
+
+            </div>               
+            
+            <p></p>
+            <p></p>
+            <div class="row">  
+                <div class="col-md-12">                                  
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#tab_1" data-toggle="tab">Consultas</a></li>
+                        <li><a href="#tab_2" data-toggle="tab">Diagnosticos</a></li>                        
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab_1">
+                            <a href="" id="bt_newConsulta" class="btn btn-default" disabled>Nova Consulta</a>
+                            <p></p>
+                            <div class="table-responsive">
+                                <div style="max-width:900px;">
+                                    <table class="table table-bordered table-selectable" id="tableConsulta">                    
+                                        <thead>
+                                            <th>Dt Consulta</th>                            
+                                            <th>Diagnostico</th>
+                                            <th>Conduta</th>                            
+                                            <th>CID</th>                                                                        
+                                        </thead>
+                                        <tbody>                                            
+                
+                                        </tbody>                    
+                                    </table>                            
+                                </div>
+                            </div>   
+                        </div>
+                        <!-- /.tab-pane -->
+                        <div class="tab-pane" id="tab_2">
+                            TAB 2
+                        </div>                        
+                    </div>
+                    <!-- /.tab-content -->
+                </div>
+                <!-- nav-tabs-custom -->
+            </div>
+            <!-- /.col -->
+            </div>
+        </div>
+    </div>               
+</section><!-- /.content -->	
+
+{% endblock %}
+
+{% block javascript %}
+
+<script type="text/javascript">   
+
+    $(document).ready(function(){ 
+        
+    });
+    function myFunction(value) {            
+            var linha = '<tr class="linhaConsulta" id=' + value['id'] + '><td>' + value['dt_consulta'] + '</td><td>' + value['diagnostico'] + '</td><td>' + value['conduta'] + '</td><td>' + value['cid'] + '</td></tr>'
+            $('#tableConsulta > tbody:last-child').append(linha);
+        };
+    $("#headerPacientes").click(function(){        
+        $("#btHeader").click();
+    });
+    $(".linhaPaciente").click(function(e){        
+        $("#btHeader").click();
+        var chaveid = $(this).attr("id");
+        $("#bt_newConsulta").attr('href',"{% url 'consultorio:newConsulta' pk=12345 %}".replace("12345",chaveid));      
+        $("#bt_newConsulta").attr('disabled', false)  
+        $('#tableConsulta tbody').empty();
+        $.ajax({
+            url:"{% url 'consultorio:viewPaciente' %}",
+            type: "POST",            
+            data: {chave: chaveid, csrfmiddlewaretoken: '{{ csrf_token }}'},           
+            success:function(paciente){                    
+                var json = $.parseJSON(paciente);                       
+                $("#nomePaciente").text(json[0]['fields']['nome']);                                    
+                $("#dtNasc").text(json[0]['fields']['dt_nascimento']);                                    
+                $("#cidade").text(json[0]['fields']['cidade']);                                    
+                $("#estado").text(json[0]['fields']['estado']);       
+                $("#bt_editPaciente").attr('href', 'consultorio/editPaciente' + json[0]['fields']['pk'])
+            },            
+            complete:function(){}            
+        });
+        $.ajax({
+            url:"{% url 'consultorio:viewConsulta' %}",
+            type: "POST",            
+            data: {chave: chaveid, csrfmiddlewaretoken: '{{ csrf_token }}'},           
+            success:function(consulta){                
+                consulta.forEach(myFunction);                
+            },            
+            complete:function(){}            
+        });
+        $("#divConsultas").show();
+    });
+
+    $('#reg_pag').val('{{ filtro.pag }}'); 
+    $('#nome').val('{{ filtro.nome }}');       
+    
+    $("#tableConsulta tbody").on("click", "tr", function(event){        
+        window.location.href = "/consultorio/editConsulta/" + $(this).attr("id");
+    });
+    
+
+</script>
+
+{% endblock javascript %}

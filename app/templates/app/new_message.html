@@ -1,0 +1,56 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <h1>
+        Inbox
+        <small>Mensagens</small>
+    </h1>                    
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <!-- Your Page Content Here -->                    
+
+    <div class="box box-primary">            
+        <div class="box-body">           
+            <form method="POST"> {% csrf_token %}
+                <table class="table table-hover">
+                    <tr><td></td><td><input class="check-todos" type="checkbox" name="todos"> Todos </input></td></tr>
+                    {{ form.as_table }}
+                </table>      
+                
+                <button type="submit" class="btn btn-default">Enviar </button>
+                <a href="{% url 'app:inbox' %}" class="btn btn-default">Voltar </a>
+            </form>                       
+        </div>
+    </div>               
+</section><!-- /.content -->	
+
+{% endblock %}
+
+{% block javascript %}
+
+<script type="text/javascript">    
+    jQuery(document).ready(function(){                
+        $("#id_destinatario").selectpicker({
+            size: 5,
+            width: 'fit',
+            liveSearch: true,
+        });                    
+    });
+    $(".check-todos").click(function(e){        
+        $("#id_destinatario").val({{ request.user.id }});
+        $("#id_destinatario").selectpicker("refresh");           
+        if($("#id_destinatario").closest('tr').css("display")!="none"){
+            $("#id_destinatario").closest('tr').attr("style", "display:none");
+        }
+        else{
+            $("#id_destinatario").closest('tr').attr("style", "");
+        }        
+    });
+
+</script>
+{% endblock javascript %}

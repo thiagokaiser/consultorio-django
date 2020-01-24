@@ -1,0 +1,246 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <h1>
+        Inbox
+        <small>Mensagens</small>
+    </h1>                    
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <!-- Your Page Content Here -->                    
+
+    <div class="box box-primary">            
+        <div class="box-body">                      
+            <div class="table-responsive">                                                   
+                
+                <nav class="navbar navbar-default">
+                    <div class="container-fluid">                    
+
+                        <div class="navbar-header">
+                          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                          </button>
+                          <a class="navbar-brand" href="#">Mensagens</a>
+                        </div>
+                        <!-- Collect the nav links, forms, and other content for toggling -->
+                        
+                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                            <form class="navbar-form navbar-right" method="GET">                                
+                                <div class="form-group">                                                            
+                                    <small>Registros por pag.</small>
+                                    <select class="input-sm"  id="reg_pag" name="reg_pag">                
+                                        <option value="10">10</option>                                    
+                                        <option value="20">20</option>                                    
+                                        <option value="50">50</option>                                    
+                                        <option value="100">100</option>                
+                                    </select>                                           
+                                </div>                       
+                                <div class="form-group">                            
+                                    <small>Ordenar por:</small>
+                                    <select class="input-sm"  id="ordenar" name="ordenar">                
+                                        <option value="-dt_mensagem">Data</option>
+                                        <option value="assunto">Assunto</option>
+                                        <option value="remetente">Remetente</option>                                                        
+                                    </select>                                                  
+                                </div>                        
+                                <div class="form-group">              
+                                    <input class="input-sm" pattern="[a-zA-Z0-9]+" type="text" id="buscar" name="buscar" value='{{ filtro.filtro1 }}' placeholder="Buscar...">
+                                    <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+                                </div>                        
+                            </form>                                                                                                     
+                        </div>                                                                        
+                    </div>
+                </nav>
+                <table>
+                    <tr>
+                        <td>
+                            <a type="button" class="btn btn-default btn-sm checkbox-toggle btn-selec-all"><span class="selec-all" value="false"><i class="fa fa-square-o"></i></span></a>                
+                            <a href="{% url 'app:new_msg' %}" type="button" class="btn btn-default btn-sm"><i class="fa fa-file-o" aria-hidden="true"></i></i></a>
+                            <a id="bt-del" href="" type="button" class="btn btn-default btn-sm"                                
+                               data-toggle="confirmation" data-placement="bottom"
+                               data-btn-ok-label="Confirmar" data-btn-ok-icon="glyphicon glyphicon-share-alt"
+                               data-btn-ok-class="btn-success"
+                               data-btn-cancel-label="Cancelar" data-btn-cancel-icon="glyphicon glyphicon-ban-circle"
+                               data-btn-cancel-class="btn-danger"
+                               data-title="Tem certeza?" data-content="A mensagem será excluida permanentemente."><i class="fa fa-trash-o"></i></a>
+                            <a href="{% url 'app:inbox' %}" type="button" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></a>
+                        </td>
+                        <td>&nbsp;</td>
+                        <td>                            
+                            <div class="dropdown">
+                                <button href="#" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">More <span class="caret"></span></button>
+                                <ul class="dropdown-menu">
+                                    <li><a id="bt-lido" href="#">Marcar como lido</a></li>
+                                    <li><a id="bt-nao-lido" href="#">Marcar como não lido</a></li>                                    
+                                </ul>
+                            </div>      
+                        </td>
+                    </tr>
+                </table>          
+                <p/>
+                <div class="table-responsive">
+                    <table class="table table-selectable-multiple" style="width: 100%;">                    
+                        {% for msg in mensagem %}
+                            {% if msg.lida == False %}
+                            <tr class="linhainbox" style="font-weight:bold" id="{{ msg.pk }}">
+                            {% else %}
+                            <tr class="linhainbox" id="{{ msg.pk }}">
+                            {% endif %}                           
+                                <td class="checkboxinbox" align="center" style="width:45px;"><input type="checkbox"></td>
+                                <td class="colunainbox">{{ msg.remetente | slice:":10"  }}</td>
+                                <td class="colunainbox">{{ msg.assunto | slice:":25"  }} <span style="color:gray;"> - {{ msg.mensagem | slice:":60" }}</span></td>
+                                <td align="right" class="colunainbox">{{ msg.dt_mensagem }}</td>
+                            </tr>                    
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+
+            <ul class="pagination">
+                {% if mensagem.has_previous %}
+                    <li><a href="{{ filtro.url }}&page=1"><span class="fa fa-angle-double-left"></span></a></li>
+                    <li><a href="{{ filtro.url }}&page={{ mensagem.previous_page_number }}"><span class="fa fa-angle-left"></span></a></li>
+                {% else %}
+                    <li class="disabled"><span class="fa fa-angle-double-left"></span></li>
+                    <li class="disabled"><span class="fa fa-angle-left"></span></li>
+                {% endif %}
+                {% for page in mensagem.paginator.page_range %}
+                    {% if page >= mensagem.number|add:"-3" and page < mensagem.number %}
+                        <li><a href="{{ filtro.url }}&page={{ page }}">{{ page }}</a></li>
+                    {% endif %}
+                    {% ifequal mensagem.number page %}
+                        <li class="active"><span>{{ mensagem.number }}</span></li>
+                    {% endifequal %}                    
+                    {% if page <= mensagem.number|add:"3" and page > mensagem.number %}
+                        <li><a href="{{ filtro.url }}&page={{ page }}">{{ page }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if mensagem.has_next %}
+                    <li><a href="{{ filtro.url }}&page={{ mensagem.next_page_number }}"><span class="fa fa-angle-right"></span></a></li>
+                    <li><a href="{{ filtro.url }}&page={{ mensagem.paginator.num_pages }}"><span class="fa fa-angle-double-right"></span></a></li>
+                {% else %}
+                    <li class="disabled"><span class="fa fa-angle-right"></span></li>      
+                    <li class="disabled"><span class="fa fa-angle-double-right"></span></li>
+                {% endif %}                
+            </ul>
+                       
+        </div>
+    </div>               
+</section><!-- /.content -->	
+
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">    
+    
+    $(document).ready(function(){
+        
+    });    
+    $('#bt-del').confirmation({
+        rootSelector: '[data-toggle=confirmation]',
+        onConfirm: function () {
+            var msgs_lista = [];        
+            $(".selected").each(function(index) {                        
+                msgs_lista.push($(this).attr('id'));             
+            });        
+            $.ajax({
+                url:"{% url 'app:del_msg' %}",
+                type: "POST",            
+                data: {msgs_list: msgs_lista, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                success:function(response){
+                window.location.href= "{% url 'app:inbox' %}"
+                },
+                complete:function(){},
+                error:function (xhr, textStatus, thrownError){}
+            });
+        }
+    });
+    $("#bt-lido").click(function(e){
+        e.preventDefault();
+        var msgs_lista = [];
+        $(".selected").each(function(index) {                        
+            msgs_lista.push($(this).attr('id'));             
+        });        
+        $.ajax({
+            url:"{% url 'app:read_msg' %}",
+            type: "POST",            
+            data: {msgs_list: msgs_lista, csrfmiddlewaretoken: '{{ csrf_token }}'},
+            success:function(response){
+                window.location.reload();
+            },
+            complete:function(){},
+            error:function (xhr, textStatus, thrownError){}
+        });
+    });
+    $("#bt-nao-lido").click(function(e){
+        e.preventDefault();
+        var msgs_lista = [];
+        $(".selected").each(function(index) {                        
+            msgs_lista.push($(this).attr('id'));             
+        });        
+        $.ajax({
+            url:"{% url 'app:unread_msg' %}",
+            type: "POST",            
+            data: {msgs_list: msgs_lista, csrfmiddlewaretoken: '{{ csrf_token }}'},
+            success:function(response){
+                window.location.reload();
+            },
+            complete:function(){},
+            error:function (xhr, textStatus, thrownError){}
+        });
+    });
+
+
+    $(".colunainbox").click(function(e) {
+      window.location.href = "/app/msg/" + $(this).closest("tr").attr("id") + "/";
+    });    
+    $(".checkboxinbox").click(function(e) {      
+      if ($(this).closest("tr").hasClass("selected")) {
+        $(this).closest("tr").removeClass("selected");
+        $(this).closest("tr")
+          .find("input[type='checkbox']")
+          .prop("checked", false);
+      } else {
+        $(this).closest("tr").addClass("selected");
+        $(this).closest("tr")
+          .find("input[type='checkbox']")
+          .prop("checked", true);
+      }
+    });
+    $(".btn-selec-all").click(function(e) {
+        valor = $(this).val();
+        $(this).val(!valor);
+        if ($(this).val() == true){
+            $(".selec-all")[0].innerHTML = "<i class='fa fa-check-square-o'></i>";                              
+
+            $(".linhainbox").each(function( index ) {
+                $(this).addClass("selected");
+                $(this).find("input[type='checkbox']").prop("checked", true);
+            });             
+            
+        }
+        else{
+            $(".selec-all")[0].innerHTML = "<i class='fa fa-square-o'></i>";      
+            $(".checkboxinbox").trigger('click');
+
+            $(".linhainbox").each(function( index ) {
+                $(this).removeClass("selected");
+                $(this).find("input[type='checkbox']").prop("checked", false);
+            });            
+        }      
+    });
+
+    $('#reg_pag').val('{{ filtro.pag }}'); 
+    $('#ordenar').val('{{ filtro.ordenar }}'); 
+    $('#buscar').val('{{ filtro.buscar }}');     
+
+</script>
+{% endblock javascript %}

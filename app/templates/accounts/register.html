@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+
+        <!-- Tell the browser to be responsive to screen width -->
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+        {% block title %}
+            <title>Registrar</title>
+        {% endblock title %}
+
+        {% load static %}
+        <!-- Bootstrap 3.3.4 -->
+        <link rel="stylesheet" type="text/css" href="{% static 'app/bootstrap/css/bootstrap.css' %}" />
+        <!-- Theme style -->
+        <link rel="stylesheet" type="text/css" href="{% static 'app/dist/css/AdminLTE.css' %}" />
+        <!-- CSS TEMPLATE -->
+        <link rel="stylesheet" type="text/css" href="{% static 'app/style.css' %}" />
+        <!-- CSS Tema azul -->
+        <link rel="stylesheet" type="text/css" href="{% static 'app/dist/css/skins/skin-black-light.css' %}" />        
+        <!-- Font Awesome Icons -->
+        <link rel="stylesheet" type="text/css" href="{% static 'app/font-awesome/css/font-awesome.min.css' %}" />        
+        
+
+
+    </head>
+
+
+    <body class="register-page">
+		<div class="container">
+		    <div class="box box-primary">
+		        <h2 class="text-center">Registrar</h2>
+		        <div class="modal-body">		
+		        	<form method="POST">
+						{% csrf_token %}
+						<table class="table table-hover">
+							{{ form.as_table }}
+						</table>
+						<button type="submit" class="btn btn-primary">Registrar</button>
+						<a class="btn btn-primary" href="{% url 'app:login' %}">Voltar</a>
+					</form>            		            
+		        </div>
+		    </div>
+		    
+		
+	</body>
+</html>		  
+
+
+
+
+
+

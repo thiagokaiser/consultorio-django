@@ -1,0 +1,81 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+<head>
+    {% load static %}        
+    <style>
+        .preview {
+            margin: 20px 0 10px 0;            
+        }
+        .preview--rounded {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+        }
+        .imagem_perfil{
+            text-align: center;                            
+        }
+        .glyphicon{
+            font-size: 22px;
+        }
+        .texto_user p {
+            margin-top:10px;
+            font-size:16px;
+
+        }
+        td{              
+            font-size: 16px;   
+            vertical-align: middle;
+            padding-left: 10px;
+            padding-top:5px;
+        }        
+    </style>
+</head>
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <h1>
+        Perfil
+        <small>Consulta Informações</small>
+    </h1>                    
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <!-- Your Page Content Here -->                    
+
+    <div class="box box-primary">            
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-4 col-sm-6 col-xs-12 imagem_perfil" style="max-width:200px;">                
+                    {% if profile.foto_perfil %}
+                        <img src="{{ profile.foto_perfil.url }}" class="preview preview--rounded">
+                    {% else %}
+                        <img src="{% static 'img/img-user.jpg' %}" class="preview preview--rounded">
+                    {% endif %}                            
+                    <a href="{% url 'app:edit_profilepic' %}">Alterar Imagem</a>                     
+                    
+                </div>
+                <div class="col-md-8 col-sm-6 col-xs-12">
+                    <h4>{{ user.first_name }} {{ user.last_name }}</h4>
+                    <div class="texto_user">
+                        <table>
+                            <tr><td><i class="glyphicon glyphicon-user"></i></td><td>{{ user }}</td></tr>
+                            <tr><td><i class="glyphicon glyphicon-envelope"></i></td><td>{{ user.email }}</td></tr>
+                            <tr><td><i class="glyphicon glyphicon-gift"></i></td><td>{{ profile.dt_nascimento }}</td></tr>
+                            <tr><td><i class="glyphicon glyphicon-map-marker"></i></td><td>{{ profile.cidade }} - {{ profile.estado }}</td></tr>
+                        </table>                        
+                        <p>{{ profile.descricao }}</p>
+                    </div>
+
+                </div>
+            </div>
+            <hr>
+            <a class="btn btn-default" href="{% url 'app:edit_profile' %}">Editar Perfil</a>
+            <a class="btn btn-default" href="{% url 'app:change_password' %}">Alterar Senha</a>                     
+
+        </div>
+    </div>                    
+</section><!-- /.content -->	
+
+{% endblock %}

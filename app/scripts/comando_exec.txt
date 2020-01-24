@@ -1,0 +1,1 @@
+exec(open('app/scripts/importa_skins.py').read())

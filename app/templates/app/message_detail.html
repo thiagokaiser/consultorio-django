@@ -1,0 +1,64 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <h1>
+        Inbox
+        <small>Mensagens</small>
+    </h1>                    
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <!-- Your Page Content Here -->                    
+
+    <div class="box box-primary">            
+        <div class="box-body">          
+            <a href="{% url 'app:inbox' %}" class="btn btn-default">Inbox </a>
+            <a id="bt-del" class="btn btn-default" 
+               data-toggle="confirmation" data-placement="bottom"
+               data-btn-ok-label="Confirmar" data-btn-ok-icon="glyphicon glyphicon-share-alt"
+               data-btn-ok-class="btn-success"
+               data-btn-cancel-label="Cancelar" data-btn-cancel-icon="glyphicon glyphicon-ban-circle"
+               data-btn-cancel-class="btn-danger"
+               data-title="Tem certeza?" data-content="A mensagem será excluida permanentemente.">Deletar </a>
+            <p></p>
+            De: {{ msg.remetente }}<br>
+            {{ msg.dt_mensagem }}<br>
+            <h4>Assunto: {{ msg.assunto }}</h4>
+            <div class="form-group">              
+              <textarea class="form-control" rows="10" id="comment">{{ msg.mensagem }}</textarea>
+            </div>            
+                       
+        </div>
+    </div>               
+</section><!-- /.content -->	
+
+{% endblock %}
+
+{% block javascript %}
+
+<script type="text/javascript">        
+
+    $('#bt-del').confirmation({
+        rootSelector: '[data-toggle=confirmation]',
+        onConfirm: function () {
+            var msgs_lista = [];        
+            msgs_lista.push({{ msg.pk }});
+            $.ajax({
+                url:"{% url 'app:del_msg' %}",
+                type: "POST",            
+                data: {msgs_list: msgs_lista, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                success:function(response){
+                window.location.href= "{% url 'app:inbox' %}"
+                },
+                complete:function(){},
+                error:function (xhr, textStatus, thrownError){}
+            });
+        }
+    });
+
+</script>
+{% endblock javascript %}
